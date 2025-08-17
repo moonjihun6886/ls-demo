@@ -62,7 +62,11 @@ export default function Landing() {
     <div className="dark-container">
       <header className="dark-header">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div className="h-9 w-9 flex items-center justify-center bg-white text-black font-bold" style={{ borderRadius: 0 }}>K</div>
+          <img
+            src="https://customer-assets.emergentagent.com/job_kog-memecoin/artifacts/3z1yq77v_LongSi.jpg"
+            alt="KOG logo"
+            className="dark-logo kog-logo"
+          />
           <div className="heading-2 tracking-tight">KING OF GAMBLER</div>
         </div>
         <nav className="dark-nav">
