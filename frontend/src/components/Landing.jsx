@@ -27,13 +27,13 @@ const NeonSpline = () => {
     return () => io.disconnect();
   }, []);
 
-  const Spline = React.useMemo(() => React.lazy(() => import("@splinetool/react-spline")), []);
+  const Spline = React.lazy(() => import("@splinetool/react-spline"));
 
   return (
     <div ref={ref} style={{ width: 700, height: 700 }} className="hidden md:block">
       {visible ? (
         <Suspense fallback={<div className="w-full h-full" />}> 
-          <Spline.default scene="https://prod.spline.design/NbVmy6DPLhY-5Lvg/scene.splinecode" />
+          <Spline scene="https://prod.spline.design/NbVmy6DPLhY-5Lvg/scene.splinecode" />
         </Suspense>
       ) : (
         <div className="w-full h-full" />
