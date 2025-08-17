@@ -3,44 +3,11 @@ import { useToast } from "../hooks/use-toast";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { ArrowRight, Coins, Crown, Shield, Zap, Twitter, Send, ExternalLink, Copy } from "lucide-react";
 import { useContent } from "../hooks/useContent";
+import Dice3D from "./Dice3D";
 
 const Section = ({ id, children, className = "" }) => (
   <section id={id} className={`dark-full-container ${className}`}>{children}</section>
 );
-
-// Lazy Spline loader only when in viewport
-const NeonSpline = () => {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          io.disconnect();
-        }
-      });
-    }, { threshold: 0.2 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  const Spline = React.lazy(() => import("@splinetool/react-spline"));
-
-  return (
-    <div ref={ref} style={{ width: 700, height: 700 }} className="hidden md:block">
-      {visible ? (
-        <Suspense fallback={<div className="w-full h-full" />}> 
-          <Spline scene="https://prod.spline.design/NbVmy6DPLhY-5Lvg/scene.splinecode" />
-        </Suspense>
-      ) : (
-        <div className="w-full h-full" />
-      )}
-    </div>
-  );
-};
 
 export default function Landing() {
   const { toast } = useToast();
@@ -162,10 +129,10 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            {/* Right 3D Spline */}
+            {/* Right: 3D Dice */}
             <div className="relative flex justify-center lg:justify-end overflow-visible">
               <div className="neon-orb" />
-              <NeonSpline />
+              <Dice3D />
             </div>
           </div>
         </div>
