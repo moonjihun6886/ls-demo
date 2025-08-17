@@ -158,9 +158,7 @@
 
 ## test_plan:
   current_focus:
-    - "Verify GET /api/content returns seeded defaults"
-    - "PUT /api/content to set contractAddress and one CTA, then GET to verify persistence"
-    - "Smoke GET /api/ and POST/GET /api/status"
+    - "Backend testing completed successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
