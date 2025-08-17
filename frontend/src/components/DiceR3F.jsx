@@ -90,10 +90,9 @@ function DiceMesh({ size = 1 }) {
 export default function DiceR3F({ viewport = 700, cube = 2.4 }) {
   return (
     <div className="hidden md:block" style={{ width: viewport, height: viewport }}>
-      <Canvas shadows camera={{ position: [3, 2, 5], fov: 40 }} dpr={[1, 2]}>
-        <color attach="background" args={[0x000000]} />
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1.3} castShadow />
+      <Canvas shadows camera={{ position: [3, 2, 5], fov: 40 }} dpr={[1, 2]} gl={{ alpha: true }} style={{ background: "transparent" }}>
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[5, 5, 5]} intensity={1.4} castShadow />
         <Float floatIntensity={1.2} rotationIntensity={0.2} speed={1.5}>
           <DiceMesh size={cube} />
         </Float>
