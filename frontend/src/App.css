@@ -29,6 +29,8 @@ body { background: var(--bg-primary); color: var(--text-primary); font-family: '
 .dark-nav-link { color: var(--text-secondary); text-decoration: none; font-size: 18px; transition: color 0.3s ease; }
 .dark-nav-link:hover { color: var(--text-primary); }
 .dark-nav-link.active { color: var(--brand-active); }
+.dark-logo { height: 40px; object-fit: cover; cursor: pointer; }
+.kog-logo { width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.2); }
 
 /* Containers */
 .dark-container { background: var(--bg-primary); min-height: 100vh; padding: 80px 0 0; }
