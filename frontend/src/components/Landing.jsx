@@ -4,6 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { ArrowRight, Coins, Crown, Shield, Zap, Twitter, Send, ExternalLink, Copy } from "lucide-react";
 import { useContent } from "../hooks/useContent";
 import DiceR3F from "./DiceR3F";
+import LightRays from "./LightRays";
 
 const Section = ({ id, children, className = "" }) => (
   <section id={id} className={`dark-full-container ${className}`}>{children}</section>
@@ -11,7 +12,7 @@ const Section = ({ id, children, className = "" }) => (
 
 export default function Landing() {
   const { toast } = useToast();
-  const { data, contract } = useContent();
+  const { data } = useContent();
 
   const hero = data?.hero || { title: "KING OF GAMBLER", ticker: "$KOG", subtitle: "From cell to casino — the legendary Long Si is back to reclaim his throne. Dark. Rebellious. Unstoppable.", ctas: { dexUrl: "#", telegram: "#", twitter: "#" } };
   const tokenomics = data?.tokenomics || [
@@ -81,8 +82,9 @@ export default function Landing() {
       </header>
 
       <Section id="hero" className="pad-xlarge">
-        <div className="dark-content-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
+        <div className="dark-content-container relative">
+          <LightRays className="absolute inset-0" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 relative z-[1]">
             <div className="space-y-6">
               <h1 className="display-huge">{hero.title} <span className="body-medium align-middle gold-text">{hero.ticker}</span></h1>
               <div className="gold-underline" />
@@ -107,7 +109,6 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            {/* Right: Real 3D dice matching red plastic look */}
             <div className="relative flex justify-center lg:justify-end overflow-visible">
               <div className="neon-orb" />
               <DiceR3F viewport={700} cube={2.4} />
@@ -115,8 +116,6 @@ export default function Landing() {
           </div>
         </div>
       </Section>
-
-      {/* The rest of the sections remain unchanged below ... */}
 
       <Section id="features" className="pad-large">
         <div className="dark-content-container dark-grid">
