@@ -3,6 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./components/Landing";
 import { Toaster } from "./components/ui/toaster";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </BrowserRouter>
       <Toaster />
