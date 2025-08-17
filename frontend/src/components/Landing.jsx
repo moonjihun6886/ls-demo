@@ -1,9 +1,9 @@
-import React, { useMemo, useEffect, useRef, Suspense, useState } from "react";
+import React, { useMemo } from "react";
 import { useToast } from "../hooks/use-toast";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { ArrowRight, Coins, Crown, Shield, Zap, Twitter, Send, ExternalLink, Copy } from "lucide-react";
 import { useContent } from "../hooks/useContent";
-import Dice3D from "./Dice3D";
+import DiceR3F from "./DiceR3F";
 
 const Section = ({ id, children, className = "" }) => (
   <section id={id} className={`dark-full-container ${className}`}>{children}</section>
@@ -11,35 +11,26 @@ const Section = ({ id, children, className = "" }) => (
 
 export default function Landing() {
   const { toast } = useToast();
-  const { data, loading, error, contract, ctas } = useContent();
+  const { data, contract } = useContent();
 
-  const hero = data?.hero || {
-    title: "KING OF GAMBLER",
-    ticker: "$KOG",
-    subtitle: "From cell to casino — the legendary Long Si is back to reclaim his throne. Dark. Rebellious. Unstoppable.",
-    ctas: { dexUrl: "#", telegram: "#", twitter: "#" }
-  };
-
+  const hero = data?.hero || { title: "KING OF GAMBLER", ticker: "$KOG", subtitle: "From cell to casino — the legendary Long Si is back to reclaim his throne. Dark. Rebellious. Unstoppable.", ctas: { dexUrl: "#", telegram: "#", twitter: "#" } };
   const tokenomics = data?.tokenomics || [
     { label: "Liquidity", value: 50, note: "Locked at launch" },
     { label: "Community & Airdrops", value: 25, note: "For real degens" },
     { label: "Marketing", value: 15, note: "Partnerships & PR" },
     { label: "CEX/Reserve", value: 10, note: "Strategic listings" },
   ];
-
   const howToBuy = data?.howToBuy || [
     { step: 1, title: "Get a Wallet", detail: "Use MetaMask or any EVM-compatible wallet." },
     { step: 2, title: "Fund with ETH", detail: "Transfer ETH to your wallet for gas and swaps." },
     { step: 3, title: "Go to DEX", detail: "Use our DEX link and paste the $KOG contract." },
     { step: 4, title: "Swap & Hold", detail: "Set slippage if needed. Welcome to the high-rollers club." },
   ];
-
   const roadmap = data?.roadmap || [
     { title: "Phase I — Breakout", points: ["Contract deploy", "Stealth + fair launch", "Community ignition"] },
     { title: "Phase II — Back to the Table", points: ["DEX pools + liquidity", "Marketing waves", "Meme ops & partnerships"] },
     { title: "Phase III — Crown the King", points: ["CEX outreach", "On-chain mini-games", "DAO vibes & community events"] },
   ];
-
   const faqs = data?.faqs || [
     { q: "What chain is $KOG on?", a: "$KOG launches on Ethereum. Bridge/multichain decisions will be driven by the community." },
     { q: "When is DEX live?", a: "DEX listing drops soon. Stay tuned on Telegram/Twitter for the exact time." },
@@ -49,25 +40,15 @@ export default function Landing() {
 
   const onUrlCTA = (url, label) => (e) => {
     e.preventDefault();
-    if (url && url.startsWith("http")) {
-      window.open(url, "_blank");
-    } else {
-      toast({ title: `${label} coming soon`, description: "We'll drop the link here at launch.", duration: 3000 });
-    }
+    if (url && url.startsWith("http")) window.open(url, "_blank");
+    else toast({ title: `${label} coming soon`, description: "We'll drop the link here at launch.", duration: 3000 });
   };
 
   const copyContract = async () => {
-    const c = contract?.trim();
-    if (!c || c.length < 10) {
-      toast({ title: "Contract TBA", description: "We'll publish the address soon.", duration: 2500 });
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(c);
-      toast({ title: "Copied", description: `${c.slice(0, 6)}...${c.slice(-4)} copied`, duration: 2500 });
-    } catch (_) {
-      toast({ title: "Copy failed", description: "Clipboard unavailable in this browser", duration: 2500 });
-    }
+    const c = (data?.config?.contractAddress || "").trim();
+    if (!c || c.length < 10) return toast({ title: "Contract TBA", description: "We'll publish the address soon.", duration: 2500 });
+    try { await navigator.clipboard.writeText(c); toast({ title: "Copied", description: `${c.slice(0,6)}...${c.slice(-4)} copied`, duration: 2500 }); }
+    catch { toast({ title: "Copy failed", description: "Clipboard unavailable in this browser", duration: 2500 }); }
   };
 
   const features = useMemo(() => [
@@ -78,7 +59,6 @@ export default function Landing() {
 
   return (
     <div className="dark-container">
-      {/* Header */}
       <header className="dark-header">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <div className="h-9 w-9 flex items-center justify-center bg-white text-black font-bold" style={{ borderRadius: 0 }}>K</div>
@@ -92,7 +72,7 @@ export default function Landing() {
         </nav>
         <div className="hidden md:flex items-center gap-3">
           <button className="btn-secondary dark-button-animate contract-pill" onClick={copyContract}>
-            <Copy size={18} /> {contract && contract.length > 10 ? `${contract.slice(0,6)}...${contract.slice(-4)}` : "Copy Contract"}
+            <Copy size={18} /> {data?.config?.contractAddress && data.config.contractAddress.length > 10 ? `${data.config.contractAddress.slice(0,6)}...${data.config.contractAddress.slice(-4)}` : "Copy Contract"}
           </button>
           <a href={hero.ctas?.dexUrl || "#"} onClick={onUrlCTA(hero.ctas?.dexUrl, "DEX link")} className="btn-primary dark-button-animate">
             Buy on DEX <ArrowRight size={18} />
@@ -100,11 +80,9 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero */}
       <Section id="hero" className="pad-xlarge">
         <div className="dark-content-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
-            {/* Left copy */}
             <div className="space-y-6">
               <h1 className="display-huge">{hero.title} <span className="body-medium align-middle gold-text">{hero.ticker}</span></h1>
               <div className="gold-underline" />
@@ -129,16 +107,17 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            {/* Right: 3D Dice */}
+            {/* Right: Real 3D dice matching red plastic look */}
             <div className="relative flex justify-center lg:justify-end overflow-visible">
               <div className="neon-orb" />
-              <Dice3D />
+              <DiceR3F viewport={700} cube={2.4} />
             </div>
           </div>
         </div>
       </Section>
 
-      {/* Features */}
+      {/* The rest of the sections remain unchanged below ... */}
+
       <Section id="features" className="pad-large">
         <div className="dark-content-container dark-grid">
           {features.map((f, idx) => (
@@ -153,7 +132,6 @@ export default function Landing() {
         </div>
       </Section>
 
-      {/* Tokenomics */}
       <Section id="tokenomics" className="pad-large">
         <div className="dark-content-container">
           <div className="mb-8">
@@ -173,7 +151,6 @@ export default function Landing() {
         </div>
       </Section>
 
-      {/* How to Buy */}
       <Section id="how-to-buy" className="pad-large">
         <div className="dark-content-container">
           <div className="mb-8">
@@ -193,7 +170,6 @@ export default function Landing() {
         </div>
       </Section>
 
-      {/* Roadmap */}
       <Section id="roadmap" className="pad-large">
         <div className="dark-content-container">
           <div className="mb-8">
@@ -216,7 +192,6 @@ export default function Landing() {
         </div>
       </Section>
 
-      {/* FAQ */}
       <Section id="faq" className="pad-large">
         <div className="dark-content-container">
           <div className="mb-8">
@@ -237,7 +212,6 @@ export default function Landing() {
         </div>
       </Section>
 
-      {/* CTA */}
       <Section id="cta" className="pad-large">
         <div className="dark-content-container">
           <div className="glass-panel p-8 flex flex-col md:flex-row items-center justify-between gap-6 gold-border">
@@ -260,7 +234,6 @@ export default function Landing() {
         </div>
       </Section>
 
-      {/* Footer */}
       <footer className="dark-full-container border-t" style={{ borderColor: "var(--border-subtle)" }}>
         <div className="dark-content-container py-10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="body-small text-white/60">© {new Date().getFullYear()} KING OF GAMBLER — $KOG</div>
