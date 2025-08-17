@@ -101,3 +101,64 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+## user_problem_statement: Build a bold, dark neon landing for King of Gambler ($KOG) with 3D right-side visual, gold accents, Buy on DEX + community CTAs, and a Copy Contract pill. Replace mocks with backend.
+
+## backend:
+  - task: "Public content API (/api/content) with default seeding"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "Implemented GET/PUT /api/content with Mongo seed; needs testing via deep agent."
+  - task: "Status check baseline endpoints"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "Carry-over endpoints; verify still OK."
+
+## frontend:
+  - task: "Landing page UI + gold accents + lazy Spline + Copy Contract + backend integration via useContent"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Landing.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Initial timeout reported due to load; addressed with Spline lazy-load."
+      - working: true
+        agent: "main"
+        comment: "UI renders; Copy Contract shows TBA until backend config set; CTAs show toasts when URLs missing."
+
+## metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+## test_plan:
+  current_focus:
+    - "Verify GET /api/content returns seeded defaults"
+    - "PUT /api/content to set contractAddress and one CTA, then GET to verify persistence"
+    - "Smoke GET /api/ and POST/GET /api/status"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+## agent_communication:
+  - agent: "main"
+    message: "Backend implemented; please test endpoints via base '/api'. After backend test, I will ask user about automated frontend testing."
