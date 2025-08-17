@@ -14,6 +14,8 @@
   --brand-primary: #00FFD1; /* neon cyan-green */
   --brand-hover: rgba(0, 255, 209, 0.1);
   --brand-active: #6FD2C0;
+
+  --brand-gold: #D4AF37; /* gold accent */
 }
 
 /* Typography - import Kode Mono */
@@ -92,7 +94,7 @@ body {
 .btn-secondary {
   background: rgba(255, 255, 255, 0.1);
   color: #FFFFFF;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 0px;
   padding: 14px 24px;
   font-size: 18px;
@@ -109,6 +111,13 @@ body {
 }
 .btn-secondary:hover { background: #FFFFFF; color: #000000; }
 .btn-secondary:active { background: #F0F0F0; transform: scale(0.98); }
+
+.contract-pill { border-color: var(--brand-gold); }
+.gold-icon { color: var(--brand-gold); }
+.gold-border { border: 1px solid rgba(212, 175, 55, 0.35); }
+.gold-underline { width: 220px; height: 2px; background: var(--brand-gold); opacity: 0.9; margin: 8px 0 0; }
+.gold-underline.small { width: 140px; opacity: 0.7; }
+.gold-text { color: var(--brand-gold); }
 
 /* Grid */
 .dark-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 60px 40px; padding: 0; max-width: 1400px; margin: 0 auto; }

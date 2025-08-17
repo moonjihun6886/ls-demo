@@ -1,31 +1,103 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef, Suspense, useState } from "react";
 import { useToast } from "../hooks/use-toast";
-import Spline from "@splinetool/react-spline";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { ArrowRight, Coins, Crown, Shield, Zap, Twitter, Send, ExternalLink, Copy } from "lucide-react";
-import { hero, tokenomics, howToBuy, roadmap, faqs } from "../mock/mock";
+import { useContent } from "../hooks/useContent";
 
 const Section = ({ id, children, className = "" }) => (
   <section id={id} className={`dark-full-container ${className}`}>{children}</section>
 );
 
+// Lazy Spline loader only when in viewport
+const NeonSpline = () => {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+        }
+      });
+    }, { threshold: 0.2 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const Spline = React.useMemo(() => React.lazy(() => import("@splinetool/react-spline")), []);
+
+  return (
+    <div ref={ref} style={{ width: 700, height: 700 }} className="hidden md:block">
+      {visible ? (
+        <Suspense fallback={<div className="w-full h-full" />}> 
+          <Spline.default scene="https://prod.spline.design/NbVmy6DPLhY-5Lvg/scene.splinecode" />
+        </Suspense>
+      ) : (
+        <div className="w-full h-full" />
+      )}
+    </div>
+  );
+};
+
 export default function Landing() {
   const { toast } = useToast();
+  const { data, loading, error, contract, ctas } = useContent();
 
-  const onDexClick = (e) => {
-    e.preventDefault();
-    toast({ title: "DEX listing soon", description: "We'll drop the link here at launch.", duration: 3000 });
+  const hero = data?.hero || {
+    title: "KING OF GAMBLER",
+    ticker: "$KOG",
+    subtitle: "From cell to casino — the legendary Long Si is back to reclaim his throne. Dark. Rebellious. Unstoppable.",
+    ctas: { dexUrl: "#", telegram: "#", twitter: "#" }
   };
 
-  const onCommunityClick = (platform) => (e) => {
+  const tokenomics = data?.tokenomics || [
+    { label: "Liquidity", value: 50, note: "Locked at launch" },
+    { label: "Community & Airdrops", value: 25, note: "For real degens" },
+    { label: "Marketing", value: 15, note: "Partnerships & PR" },
+    { label: "CEX/Reserve", value: 10, note: "Strategic listings" },
+  ];
+
+  const howToBuy = data?.howToBuy || [
+    { step: 1, title: "Get a Wallet", detail: "Use MetaMask or any EVM-compatible wallet." },
+    { step: 2, title: "Fund with ETH", detail: "Transfer ETH to your wallet for gas and swaps." },
+    { step: 3, title: "Go to DEX", detail: "Use our DEX link and paste the $KOG contract." },
+    { step: 4, title: "Swap & Hold", detail: "Set slippage if needed. Welcome to the high-rollers club." },
+  ];
+
+  const roadmap = data?.roadmap || [
+    { title: "Phase I — Breakout", points: ["Contract deploy", "Stealth + fair launch", "Community ignition"] },
+    { title: "Phase II — Back to the Table", points: ["DEX pools + liquidity", "Marketing waves", "Meme ops & partnerships"] },
+    { title: "Phase III — Crown the King", points: ["CEX outreach", "On-chain mini-games", "DAO vibes & community events"] },
+  ];
+
+  const faqs = data?.faqs || [
+    { q: "What chain is $KOG on?", a: "$KOG launches on Ethereum. Bridge/multichain decisions will be driven by the community." },
+    { q: "When is DEX live?", a: "DEX listing drops soon. Stay tuned on Telegram/Twitter for the exact time." },
+    { q: "Is liquidity locked?", a: "Yes. We lock liquidity at launch to protect holders." },
+    { q: "What makes $KOG different?", a: "A cinematic meme coin built on grit, risk, and comeback energy — with a bold dark-neo aesthetic." },
+  ];
+
+  const onUrlCTA = (url, label) => (e) => {
     e.preventDefault();
-    toast({ title: `Join ${platform}`, description: "Links will go live shortly.", duration: 3000 });
+    if (url && url.startsWith("http")) {
+      window.open(url, "_blank");
+    } else {
+      toast({ title: `${label} coming soon`, description: "We'll drop the link here at launch.", duration: 3000 });
+    }
   };
 
-  const copyTicker = async () => {
+  const copyContract = async () => {
+    const c = contract?.trim();
+    if (!c || c.length < 10) {
+      toast({ title: "Contract TBA", description: "We'll publish the address soon.", duration: 2500 });
+      return;
+    }
     try {
-      await navigator.clipboard.writeText(hero.ticker);
-      toast({ title: "Copied", description: `${hero.ticker} added to clipboard`, duration: 2500 });
+      await navigator.clipboard.writeText(c);
+      toast({ title: "Copied", description: `${c.slice(0, 6)}...${c.slice(-4)} copied`, duration: 2500 });
     } catch (_) {
       toast({ title: "Copy failed", description: "Clipboard unavailable in this browser", duration: 2500 });
     }
@@ -52,10 +124,10 @@ export default function Landing() {
           <a className="dark-nav-link" href="#faq">FAQ</a>
         </nav>
         <div className="hidden md:flex items-center gap-3">
-          <button className="btn-secondary dark-button-animate" onClick={copyTicker}>
-            <Copy size={18} /> {hero.ticker}
+          <button className="btn-secondary dark-button-animate contract-pill" onClick={copyContract}>
+            <Copy size={18} /> {contract && contract.length > 10 ? `${contract.slice(0,6)}...${contract.slice(-4)}` : "Copy Contract"}
           </button>
-          <a href="#" onClick={onDexClick} className="btn-primary dark-button-animate">
+          <a href={hero.ctas?.dexUrl || "#"} onClick={onUrlCTA(hero.ctas?.dexUrl, "DEX link")} className="btn-primary dark-button-animate">
             Buy on DEX <ArrowRight size={18} />
           </a>
         </div>
@@ -67,16 +139,17 @@ export default function Landing() {
           <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
             {/* Left copy */}
             <div className="space-y-6">
-              <h1 className="display-huge">{hero.title} <span className="body-medium align-middle">{hero.ticker}</span></h1>
+              <h1 className="display-huge">{hero.title} <span className="body-medium align-middle gold-text">{hero.ticker}</span></h1>
+              <div className="gold-underline" />
               <p className="body-medium max-w-xl">{hero.subtitle}</p>
               <div className="flex flex-wrap items-center gap-3">
-                <a href={hero.ctas.dexUrl} onClick={onDexClick} className="btn-primary dark-button-animate">
+                <a href={hero.ctas?.dexUrl || "#"} onClick={onUrlCTA(hero.ctas?.dexUrl, "DEX link")} className="btn-primary dark-button-animate">
                   Buy on DEX <ExternalLink size={18} />
                 </a>
-                <button className="btn-secondary dark-button-animate" onClick={onCommunityClick('Telegram')}>
+                <button className="btn-secondary dark-button-animate" onClick={onUrlCTA(hero.ctas?.telegram, "Telegram")}>
                   <Send size={18} /> Join Telegram
                 </button>
-                <button className="btn-secondary dark-button-animate" onClick={onCommunityClick('X/Twitter')}>
+                <button className="btn-secondary dark-button-animate" onClick={onUrlCTA(hero.ctas?.twitter, "X/Twitter")}>
                   <Twitter size={18} /> Join X
                 </button>
               </div>
@@ -92,9 +165,7 @@ export default function Landing() {
             {/* Right 3D Spline */}
             <div className="relative flex justify-center lg:justify-end overflow-visible">
               <div className="neon-orb" />
-              <div style={{ width: 700, height: 700 }} className="hidden md:block">
-                <Spline scene="https://prod.spline.design/NbVmy6DPLhY-5Lvg/scene.splinecode" />
-              </div>
+              <NeonSpline />
             </div>
           </div>
         </div>
@@ -106,7 +177,7 @@ export default function Landing() {
           {features.map((f, idx) => (
             <div key={idx} className="glass-panel p-8 dark-transition">
               <div className="flex items-center gap-3 mb-3">
-                <f.icon className="text-white" size={22} />
+                <f.icon className="gold-icon" size={22} />
                 <div className="heading-2">{f.title}</div>
               </div>
               <p className="body-medium text-white/80">{f.desc}</p>
@@ -120,11 +191,12 @@ export default function Landing() {
         <div className="dark-content-container">
           <div className="mb-8">
             <h2 className="display-large">Tokenomics</h2>
+            <div className="gold-underline small" />
             <p className="body-small text-white/70">Built to rally the community and fund the comeback.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {tokenomics.map((t) => (
-              <div key={t.label} className="glass-panel p-6 flex flex-col gap-2">
+              <div key={t.label} className="glass-panel p-6 flex flex-col gap-2 gold-border">
                 <div className="heading-2">{t.label}</div>
                 <div className="display-medium">{t.value}%</div>
                 <div className="body-small text-white/70">{t.note}</div>
@@ -139,11 +211,12 @@ export default function Landing() {
         <div className="dark-content-container">
           <div className="mb-8">
             <h2 className="display-large">How to Buy</h2>
+            <div className="gold-underline small" />
             <p className="body-small text-white/70">Four quick steps to join the high-rollers.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {howToBuy.map((s) => (
-              <div key={s.step} className="glass-panel p-6">
+              <div key={s.step} className="glass-panel p-6 gold-border">
                 <div className="heading-3 text-white/80 mb-1">Step {s.step}</div>
                 <div className="heading-2 mb-1">{s.title}</div>
                 <p className="body-small text-white/70">{s.detail}</p>
@@ -158,15 +231,16 @@ export default function Landing() {
         <div className="dark-content-container">
           <div className="mb-8">
             <h2 className="display-large">Roadmap</h2>
+            <div className="gold-underline small" />
             <p className="body-small text-white/70">From breakout to the crown.</p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {roadmap.map((r) => (
-              <div key={r.title} className="glass-panel p-6">
+              <div key={r.title} className="glass-panel p-6 gold-border">
                 <div className="heading-2 mb-2">{r.title}</div>
                 <ul className="list-disc list-inside text-white/80 body-small space-y-1">
                   {r.points.map((p) => (
-                    <li key={p}>{p}</li>
+                    <li key={p}> {p} </li>
                   ))}
                 </ul>
               </div>
@@ -180,9 +254,10 @@ export default function Landing() {
         <div className="dark-content-container">
           <div className="mb-8">
             <h2 className="display-large">FAQ</h2>
+            <div className="gold-underline small" />
             <p className="body-small text-white/70">All the essentials you need to know.</p>
           </div>
-          <div className="glass-panel p-4">
+          <div className="glass-panel p-4 gold-border">
             <Accordion type="single" collapsible>
               {faqs.map((f, idx) => (
                 <AccordionItem key={idx} value={`item-${idx}`}>
@@ -198,19 +273,19 @@ export default function Landing() {
       {/* CTA */}
       <Section id="cta" className="pad-large">
         <div className="dark-content-container">
-          <div className="glass-panel p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="glass-panel p-8 flex flex-col md:flex-row items-center justify-between gap-6 gold-border">
             <div>
               <div className="display-medium">Take your seat at the table.</div>
               <div className="body-small text-white/70">The King returns. Don’t miss the first hand.</div>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <a href="#" onClick={onDexClick} className="btn-primary dark-button-animate">
+              <a href={hero.ctas?.dexUrl || "#"} onClick={onUrlCTA(hero.ctas?.dexUrl, "DEX link")} className="btn-primary dark-button-animate">
                 Buy on DEX <ArrowRight size={18} />
               </a>
-              <button className="btn-secondary dark-button-animate" onClick={onCommunityClick('Telegram')}>
+              <button className="btn-secondary dark-button-animate" onClick={onUrlCTA(hero.ctas?.telegram, "Telegram")}>
                 <Send size={18} /> Join Telegram
               </button>
-              <button className="btn-secondary dark-button-animate" onClick={onCommunityClick('X/Twitter')}>
+              <button className="btn-secondary dark-button-animate" onClick={onUrlCTA(hero.ctas?.twitter, "X/Twitter")}>
                 <Twitter size={18} /> Join X
               </button>
             </div>
@@ -223,10 +298,10 @@ export default function Landing() {
         <div className="dark-content-container py-10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="body-small text-white/60">© {new Date().getFullYear()} KING OF GAMBLER — $KOG</div>
           <div className="flex items-center gap-3">
-            <button className="btn-secondary" onClick={onCommunityClick('Telegram')}>
+            <button className="btn-secondary" onClick={onUrlCTA(hero.ctas?.telegram, "Telegram")}>
               <Send size={18} /> Telegram
             </button>
-            <button className="btn-secondary" onClick={onCommunityClick('X/Twitter')}>
+            <button className="btn-secondary" onClick={onUrlCTA(hero.ctas?.twitter, "X/Twitter")}>
               <Twitter size={18} /> X/Twitter
             </button>
           </div>
