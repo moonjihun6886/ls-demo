@@ -107,26 +107,32 @@
 ## backend:
   - task: "Public content API (/api/content) with default seeding"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "main"
         comment: "Implemented GET/PUT /api/content with Mongo seed; needs testing via deep agent."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: GET /api/content returns seeded defaults with correct schema (hero, tokenomics, howToBuy, roadmap, faqs, config). No Mongo _id leaks detected. PUT /api/content successfully updates config.contractAddress and hero.ctas.dexUrl with proper persistence verified."
   - task: "Status check baseline endpoints"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "low"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "main"
         comment: "Carry-over endpoints; verify still OK."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: GET /api/ returns correct 'Hello World' message. POST /api/status with {client_name: 'tester'} creates entry successfully. GET /api/status returns array with created entry. All responses follow correct models without Mongo _id leaks."
 
 ## frontend:
   - task: "Landing page UI + gold accents + lazy Spline + Copy Contract + backend integration via useContent"
